@@ -1,4 +1,3 @@
-
 #' Simultaneous knockoff for multi-source count data
 #'
 #' @param W Count data
@@ -21,9 +20,8 @@
 #' @export
 #'
 #' @examples
-#'
 SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_var = 1, fdr = 0.2, offset = 1,
-                  test_statistic = 'DE', filter_statistics = 3, test1 = "wilcox.test"){
+                  test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test") {
   if (!requireNamespace(ZIPG, quietly = TRUE)) {
     devtools::install_github("roulan2000/ZIPG")
   }
@@ -36,66 +34,67 @@ SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_va
   library(ZIPG)
   # library(scDesign2)
   library(knockoff)
-  if(is.null(class_K)){
-    class_K <- rep(1,dim(W)[1])
+  if (is.null(class_K)) {
+    class_K <- rep(1, dim(W)[1])
   }
-  if(is.null(data_x)){# sum(data_x) == 1
-    data_x <- as.data.frame(W[,c(1:3)])
+  if (is.null(data_x)) { # sum(data_x) == 1
+    data_x <- as.data.frame(W[, c(1:3)])
     data_x[data_x != 0] <- 0
   }
-  if(is.null(M)){
-    M <- apply(W,1,sum)
+  if (is.null(M)) {
+    M <- apply(W, 1, sum)
   }
-  name_data = names(table(class_K))
+  name_data <- names(table(class_K))
   model_K <- list()
-  c = 1
-  for(k in name_data){
+  c <- 1
+  for (k in name_data) {
     # c = 1
-    W_k <- W[class_K==k,]
-    data_x_k <- data_x[class_K==k,]
-    M_k <- M[class_K==k]
+    W_k <- W[class_K == k, ]
+    data_x_k <- data_x[class_K == k, ]
+    M_k <- M[class_K == k]
 
-    copula_result <- ZIPG_Estimate_3_1(data_x_k,W_k,M_k)
+    copula_result <- ZIPG_Estimate_3_1(data_x_k, W_k, M_k)
     model_K[[c]] <- copula_result
     c <- c + 1
   }
 
   c_w <- c()
-  for(k1 in 1:length(name_data)){
-    sub <- class_K==name_data[k1]
-    W_k <- W[sub,]
-    data_x_k <- data_x[sub,]
+  for (k1 in 1:length(name_data)) {
+    sub <- class_K == name_data[k1]
+    W_k <- W[sub, ]
+    data_x_k <- data_x[sub, ]
     M_k <- M[sub]
     y_k <- y[sub]
-    copula_result = model_K[[k1]]
+    copula_result <- model_K[[k1]]
 
-    W_k_1 <- simulate_count_copula_3(copula_result,data_x_k,M_k)
+    W_k_1 <- simulate_count_copula_3(copula_result, data_x_k, M_k)
 
-    if(test_statistic == 'DE'){
-      c_w_k <- contrast_score_computation(W_k,W_k_1,y_k,test1)
-    }else if(test_statistic == 'GLM'){
+    if (test_statistic == "DE") {
+      c_w_k <- contrast_score_computation(W_k, W_k_1, y_k, test1)
+    } else if (test_statistic == "GLM") {
       test_statistic1 <- stat.glmnet_coefdiff
       random_m <- matrix(runif(dim(W_k)[1] * dim(W_k)[2], min = 0, max = 1), nrow = dim(W_k)[1])
       W_k <- W_k + random_m
       W_k_1 <- W_k_1 + random_m
-      c_w_k  <- test_statistic1(W_k, W_k_1, y_k)
-    }else if(test_statistic == 'RF'){
+      c_w_k <- test_statistic1(W_k, W_k_1, y_k)
+    } else if (test_statistic == "RF") {
       test_statistic1 <- stat.random_forest
-      c_w_k  <- test_statistic1(W_k, W_k_1, y_k)
+      c_w_k <- test_statistic1(W_k, W_k_1, y_k)
     }
-    c_w <- rbind(c_w,c_w_k)
+    c_w <- rbind(c_w, c_w_k)
   }
   # c_w_b <- switch(filter_statistics,
   #                 apply(c_w, 2, cumprod)[dim(c_w)[1],],
   #                 apply(c_w, 2, max),
   #                 apply(c_w, 2, sum))
-  if(k1 == 1){
-    c_w_b = c_w
-  }else{
+  if (k1 == 1) {
+    c_w_b <- c_w
+  } else {
     c_w_b <- switch(filter_statistics,
-                    apply(c_w, 2, cumprod)[dim(c_w)[1],],
-                    apply(c_w, 2, max),
-                    apply(c_w, 2, sum))
+      apply(c_w, 2, cumprod)[dim(c_w)[1], ],
+      apply(c_w, 2, max),
+      apply(c_w, 2, sum)
+    )
   }
   result_fdr <- clipper_BC_2(c_w_b, fdr)
   S <- result_fdr$discovery
@@ -104,8 +103,8 @@ SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_va
   # if(!is.null(T_var)){
   #   FDRPower <- FDR_Power(S,T_var)
   # }
-  FDRPower <- FDR_Power(S,T_var)
-  FDRPower <- c(result_fdr$FDR,FDRPower$FP)
+  FDRPower <- FDR_Power(S, T_var)
+  FDRPower <- c(result_fdr$FDR, FDRPower$FP)
 
   return(list(fdr = fdr, c_w = c_w, c_w_b = c_w_b, S = S, FDRPower = FDRPower))
 }
@@ -142,88 +141,83 @@ SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_va
 #'
 #' @examples
 SKMSD_B <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var = NULL, fdr = 0.2, offset = 1,
-                    B = 1, Bstat = 2, test_statistic = 'DE', filter_statistics = 3, test1 = "wilcox.test",
-                    combine_1 = 'simul' ){
-  if (!requireNamespace(ZIPG, quietly = TRUE)) {
-    devtools::install_github("roulan2000/ZIPG")
-  }
-  # if (!requireNamespace(scDesign2, quietly = TRUE)) {
-  #   devtools::install_github("JSB-UCLA/scDesign2")
-  # }
-  if (!requireNamespace(knockoff, quietly = TRUE)) {
-    install.packages(knockoff)
-  }
+                    B = 1, Bstat = 2, test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test",
+                    combine_1 = "simul") {
+  if (!require(ZIPG)) devtools::install_github("roulan2000/ZIPG")
+  # if (!require(scDesign2)) devtools::install_github("JSB-UCLA/scDesign2")
+  if (!require(knockoff)) install.packages(knockoff)
   library(ZIPG)
   # library(scDesign2)
   library(knockoff)
-  if(is.null(class_K)){
-    class_K <- rep(1,dim(W)[1])
+  if (is.null(class_K)) {
+    class_K <- rep(1, dim(W)[1])
   }
-  if(is.null(data_x)){# sum(data_x) == 1
-    data_x <- as.data.frame(W[,c(1:3)])
+  if (is.null(data_x)) { # sum(data_x) == 1
+    data_x <- as.data.frame(W[, c(1:3)])
     data_x[data_x != 0] <- 0
   }
-  if(is.null(M)){
-    M <- apply(W,1,sum)
+  if (is.null(M)) {
+    M <- apply(W, 1, sum)
   }
-  name_data = names(table(class_K))
+  name_data <- names(table(class_K))
   model_K <- list()
-  c = 1
-  for(k in name_data){
+  c <- 1
+  for (k in name_data) {
     # c = 1
-    W_k <- W[class_K==k,]
-    data_x_k <- data_x[class_K==k,]
-    M_k <- M[class_K==k]
+    W_k <- W[class_K == k, ]
+    data_x_k <- data_x[class_K == k, ]
+    M_k <- M[class_K == k]
 
-    copula_result <- ZIPG_Estimate_3_1(data_x_k,W_k,M_k)
+    copula_result <- ZIPG_Estimate_3_1(data_x_k, W_k, M_k)
     model_K[[c]] <- copula_result
     c <- c + 1
   }
 
   c_w <- e_w <- e_w_Bk <- c()
-  for(k1 in 1:length(name_data)){
-    sub <- class_K==name_data[k1]
-    W_k <- W[sub,]
-    data_x_k <- data_x[sub,]
+  for (k1 in 1:length(name_data)) {
+    sub <- class_K == name_data[k1]
+    W_k <- W[sub, ]
+    data_x_k <- data_x[sub, ]
     M_k <- M[sub]
     y_k <- y[sub]
-    copula_result = model_K[[k1]]
+    copula_result <- model_K[[k1]]
 
     e_w_B <- c_w_B <- c()
-    for(b in 1:B){
-      W_k_1 <- simulate_count_copula_3(copula_result,data_x_k,M_k)
+    for (b in 1:B) {
+      W_k_1 <- simulate_count_copula_3(copula_result, data_x_k, M_k)
 
-      if(test_statistic == 'DE'){
-        c_w_k <- contrast_score_computation(W_k,W_k_1,y_k,test1)
-      }else if(test_statistic == 'GLM'){
+      if (test_statistic == "DE") {
+        c_w_k <- contrast_score_computation(W_k, W_k_1, y_k, test1)
+      } else if (test_statistic == "GLM") {
         test_statistic1 <- stat.glmnet_coefdiff
         random_m <- matrix(runif(dim(W_k)[1] * dim(W_k)[2], min = 0, max = 1), nrow = dim(W_k)[1])
         W_k <- W_k + random_m
         W_k_1 <- W_k_1 + random_m
-        c_w_k  <- test_statistic1(W_k, W_k_1, y_k)
-      }else if(test_statistic == 'RF'){
+        c_w_k <- test_statistic1(W_k, W_k_1, y_k)
+      } else if (test_statistic == "RF") {
         test_statistic1 <- stat.random_forest
-        c_w_k  <- test_statistic1(W_k, W_k_1, y_k)
+        c_w_k <- test_statistic1(W_k, W_k_1, y_k)
       }
-      c_w_B <- rbind(c_w_B,c_w_k)
+      c_w_B <- rbind(c_w_B, c_w_k)
 
-      gamma <- fdr/2
+      gamma <- fdr / 2
       offset <- 1
       e_w_b <- ekn(c_w_k, gamma, offset)
-      e_w_B <- rbind(e_w_B,e_w_b)
+      e_w_B <- rbind(e_w_B, e_w_b)
     }
-    e_w_Bk <- rbind(e_w_Bk,e_w_B)
-    c_w <- rbind(c_w,c_w_B)
+    e_w_Bk <- rbind(e_w_Bk, e_w_B)
+    c_w <- rbind(c_w, c_w_B)
 
-    e_w_B_k <- apply(e_w_B,2,mean)
-    e_w <- rbind(e_w,e_w_B_k)
+    e_w_B_k <- apply(e_w_B, 2, mean)
+    e_w <- rbind(e_w, e_w_B_k)
   }
 
-  if(B ==1){
+  if (B == 1) {
     c_w_k <- switch(filter_statistics,
-                    apply(c_w, 2, cumprod)[dim(c_w)[1],],
-                    apply(c_w, 2, max),
-                    apply(c_w, 2, sum))
+      apply(c_w, 2, cumprod)[dim(c_w)[1], ],
+      apply(c_w, 2, max),
+      apply(c_w, 2, sum)
+    )
     result_fdr <- clipper_BC_2(c_w_k, fdr)
     S <- result_fdr$discovery
 
@@ -231,18 +225,20 @@ SKMSD_B <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var
     # if(!is.null(T_var)){
     #   FDRPower <- FDR_Power(S,T_var)
     # }
-    FDRPower <- FDR_Power(S,T_var)
-    FDRPower <- c(result_fdr$FDR,FDRPower$FP)
-    return(list(fdr = fdr, B = B, c_w_pis = c_w, contrast_score = c_w_k,
-                S = S, FDRPower = FDRPower))
-
-  }else if(Bstat == 1){
+    FDRPower <- FDR_Power(S, T_var)
+    FDRPower <- c(result_fdr$FDR, FDRPower$FP)
+    return(list(
+      fdr = fdr, B = B, c_w_pis = c_w, contrast_score = c_w_k,
+      S = S, FDRPower = FDRPower
+    ))
+  } else if (Bstat == 1) {
     # B test_statistics, mean; First k and then B; Finally K row E-value;
-    if(combine_1 == 'simul'){
+    if (combine_1 == "simul") {
       e_value_B <- switch(filter_statistics,
-                          apply(e_w, 2, cumprod)[dim(e_w)[1],],
-                          apply(e_w, 2, max),
-                          apply(e_w, 2, sum))
+        apply(e_w, 2, cumprod)[dim(e_w)[1], ],
+        apply(e_w, 2, max),
+        apply(e_w, 2, sum)
+      )
       result_fdr <- clipper_BC_2(e_value_B, fdr)
       S <- result_fdr$discovery
 
@@ -250,54 +246,61 @@ SKMSD_B <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var
       # if(!is.null(T_var)){
       #   FDRPower <- FDR_Power(S,T_var)
       # }
-      FDRPower <- FDR_Power(S,T_var)
-      FDRPower <- c(result_fdr$FDR,FDRPower$FP)
-      return(list(fdr = fdr, B = B, c_w_pis = c_w, # contrast_score = c_w_B,
-                  e_value = e_w, e_value_B = e_value_B, combine_1 = combine_1,
-                  S = S, FDRPower = FDRPower))
-    }else if(combine_1 == 'fisher'){
+      FDRPower <- FDR_Power(S, T_var)
+      FDRPower <- c(result_fdr$FDR, FDRPower$FP)
+      return(list(
+        fdr = fdr, B = B, c_w_pis = c_w, # contrast_score = c_w_B,
+        e_value = e_w, e_value_B = e_value_B, combine_1 = combine_1,
+        S = S, FDRPower = FDRPower
+      ))
+    } else if (combine_1 == "fisher") {
       p_e_w <- e_w
       p_e_w[p_e_w == 0] <- 1
-      p_comb <- apply(-2*log(1/p_e_w),2,sum)
-      chis <- qchisq(fdr, 2*length(name_data), lower.tail = FALSE)
-      S <- which(p_comb>chis)
+      p_comb <- apply(-2 * log(1 / p_e_w), 2, sum)
+      chis <- qchisq(fdr, 2 * length(name_data), lower.tail = FALSE)
+      S <- which(p_comb > chis)
 
       # FDRPower = NULL
       # if(!is.null(T_var)){
       #   FDRPower <- FDR_Power(S,T_var)
       # }
-      FDRPower <- FDR_Power(S,T_var)
-      FDRPower <- c(fdr,FDRPower$FP)
-      return(list(fdr = fdr, B = B, c_w_pis = c_w, chis = chis,
-                  e_value = e_w, p_comb = p_comb, combine_1 = combine_1,
-                  S = S, FDRPower = FDRPower))
+      FDRPower <- FDR_Power(S, T_var)
+      FDRPower <- c(fdr, FDRPower$FP)
+      return(list(
+        fdr = fdr, B = B, c_w_pis = c_w, chis = chis,
+        e_value = e_w, p_comb = p_comb, combine_1 = combine_1,
+        S = S, FDRPower = FDRPower
+      ))
     }
-  }else if(Bstat == 2){
+  } else if (Bstat == 2) {
     # B filter_statistics, mean; First b and then K; Finally B row E-value;
     e_w_B <- c()
-    for(b in 1:B){
-      c_w_bK <- c_w[seq(b,length(name_data)*B+b-1,B),] # t:11:((n_k*T)+t-1)
+    for (b in 1:B) {
+      c_w_bK <- c_w[seq(b, length(name_data) * B + b - 1, B), ] # t:11:((n_k*T)+t-1)
       c_w_b <- switch(filter_statistics,
-                      apply(c_w_bK, 2, cumprod)[dim(c_w_bK)[1],],
-                      apply(c_w_bK, 2, max),
-                      apply(c_w_bK, 2, sum))
-      gamma <- fdr/2
+        apply(c_w_bK, 2, cumprod)[dim(c_w_bK)[1], ],
+        apply(c_w_bK, 2, max),
+        apply(c_w_bK, 2, sum)
+      )
+      gamma <- fdr / 2
       offset <- 1
       e_w_b <- ekn(c_w_b, gamma, offset)
-      e_w_B <- rbind(e_w_B,e_w_b)
+      e_w_B <- rbind(e_w_B, e_w_b)
     }
-    e_value_B <- apply(e_w_B,2,mean)
+    e_value_B <- apply(e_w_B, 2, mean)
     result_ebh <- ebh_2(e_value_B, fdr)
     S <- result_ebh$discovery
 
-    FDRPower = NULL
+    FDRPower <- NULL
     # if(!is.null(T_var)){
     #   FDRPower <- FDR_Power(S,T_var)
     # }
-    FDRPower <- FDR_Power(S,T_var)
-    FDRPower <- c(result_ebh$FDR,FDRPower$FP)
-    return(list(fdr = fdr, B = B, c_w_pis = c_w, e_w_B = e_w_B,
-                e_value = e_value_B, S = S, FDRPower = FDRPower))
+    FDRPower <- FDR_Power(S, T_var)
+    FDRPower <- c(result_ebh$FDR, FDRPower$FP)
+    return(list(
+      fdr = fdr, B = B, c_w_pis = c_w, e_w_B = e_w_B,
+      e_value = e_value_B, S = S, FDRPower = FDRPower
+    ))
   }
 }
 
@@ -327,66 +330,64 @@ SKMSD_B <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var
 #'
 #' @examples
 SKMSD_cv <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var = NULL, fdr = 0.2, offset = 1,
-                     cv = 1, method = 'ZIPG',
-                     B = 1, Bstat = 2, test_statistic = 'DE', filter_statistics = 3, test1 = "wilcox.test",
-                     combine_1 = 'simul',I = F){
-  if (!requireNamespace(ZIPG, quietly = TRUE)) {
-    devtools::install_github("roulan2000/ZIPG")
-  }
-  if (!requireNamespace(scDesign2, quietly = TRUE)) {
-    devtools::install_github("JSB-UCLA/scDesign2")
-  }
-  if (!requireNamespace(knockoff, quietly = TRUE)) {
-    install.packages(knockoff)
-  }
+                     cv = 1, method = "ZIPG",
+                     B = 1, Bstat = 2, test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test",
+                     combine_1 = "simul", I = F) {
+  if (!require(ZIPG)) devtools::install_github("roulan2000/ZIPG")
+  # if (!require(scDesign2)) devtools::install_github("JSB-UCLA/scDesign2")
+  if (!require(knockoff)) install.packages(knockoff)
   library(ZIPG)
   library(scDesign2)
   library(knockoff)
 
-  if(is.null(class_K)){
-    class_K <- rep(1,dim(W)[1])
+  if (is.null(class_K)) {
+    class_K <- rep(1, dim(W)[1])
   }
-  if(is.null(data_x)){# sum(data_x) == 1
-    data_x <- as.data.frame(W[,c(1:3)])
+  if (is.null(data_x)) { # sum(data_x) == 1
+    data_x <- as.data.frame(W[, c(1:3)])
     data_x[data_x != 0] <- 0
   }
-  if(is.null(M)){
-    M <- apply(W,1,sum)
+  if (is.null(M)) {
+    M <- apply(W, 1, sum)
   }
-  n_data = names(table(class_K))
+  n_data <- names(table(class_K))
   index <- c()
-  for(K in names(table(class_K))){
-    index1 <- sample(which(class_K==K))
+  for (K in names(table(class_K))) {
+    index1 <- sample(which(class_K == K))
     index1 <- matrix(index1[1:(floor(length(index1) / cv) * cv)], nrow = cv)
-    index <- cbind(index,index1)
+    index <- cbind(index, index1)
   }
   index <- as.matrix(index)
   S_cv <- list()
-  for(i in c(1:cv)){
-    W_f <- W[-index[i,],]
-    class_K_f <- class_K[-index[i,]]
-    data_x_f <- data_x[-index[i,],]
-    M_f <- M[-index[i,]]
-    y_f <- y[-index[i,]]
+  for (i in c(1:cv)) {
+    W_f <- W[-index[i, ], ]
+    class_K_f <- class_K[-index[i, ]]
+    data_x_f <- data_x[-index[i, ], ]
+    M_f <- M[-index[i, ]]
+    y_f <- y[-index[i, ]]
 
-    if(B ==1){
-      result_fold <- SKMSD_other(W = W_f, class_K = class_K_f, data_x = data_x_f, M = M_f, y = y_f,
-                                 fdr = fdr, offset = offset, method = method,
-                                 test_statistic = test_statistic, filter_statistics = filter_statistics,
-                                 test1 = test1)
+    if (B == 1) {
+      result_fold <- SKMSD_other(
+        W = W_f, class_K = class_K_f, data_x = data_x_f, M = M_f, y = y_f,
+        fdr = fdr, offset = offset, method = method,
+        test_statistic = test_statistic, filter_statistics = filter_statistics,
+        test1 = test1
+      )
       # return(list(fdr = fdr, c_w = c_w, c_w_b = c_w_b, S = S))
-    }else{
-      result_fold <- SKMSD_B_other(W = W_f, class_K = class_K_f, data_x = data_x_f, M = M_f, y = y_f,
-                                   fdr = fdr, offset = offset, method= method,
-                                   B = B, Bstat = Bstat, test_statistic = test_statistic, filter_statistics = filter_statistics,
-                                   test1 = test1, combine_1 = combine_1)
+    } else {
+      result_fold <- SKMSD_B_other(
+        W = W_f, class_K = class_K_f, data_x = data_x_f, M = M_f, y = y_f,
+        fdr = fdr, offset = offset, method = method,
+        B = B, Bstat = Bstat, test_statistic = test_statistic, filter_statistics = filter_statistics,
+        test1 = test1, combine_1 = combine_1
+      )
     }
     S_cv[[i]] <- result_fold
   }
   # S_cv
-  f2 <- ifelse(filter_statistics==1,3,1)
+  f2 <- ifelse(filter_statistics == 1, 3, 1)
   r_SKMSD_cv <- list(fdr = fdr, cv = cv, S_cv = S_cv, K = length(n_data))
-  r_cv <- result_cv(r_SKMSD_cv, B=B, filter_statistics = f2,I = I)
+  r_cv <- result_cv(r_SKMSD_cv, B = B, filter_statistics = f2, I = I)
 
   return(list(r_SKMSD_cv = r_SKMSD_cv, r_cv = r_cv))
 }
@@ -405,47 +406,47 @@ SKMSD_cv <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_va
 #' @export
 #'
 #' @examples
-result_cv <- function(r_SKMSD_cv, B=1, filter_statistics = NULL,I = F){
+result_cv <- function(r_SKMSD_cv, B = 1, filter_statistics = NULL, I = F) {
   cv <- r_SKMSD_cv$cv
   fdr <- r_SKMSD_cv$fdr
-  K = r_SKMSD_cv$K
+  K <- r_SKMSD_cv$K
   FP <- SS <- SS_f <- SS_I <- list()
   SS1 <- SS_f1 <- SS_I1 <- c()
   S_cv <- r_SKMSD_cv$S_cv
-  for(i in 1:cv){
+  for (i in 1:cv) {
     result_fold <- S_cv[[i]]
-    if(B == 1){
-      SS[[i]] = result_fold$S;
-      SS1 = c(SS1,result_fold$S);
-      FP[[i]] = result_fold$FDRPower;
-      if(!is.null(filter_statistics)){
-        S_f <- filter_cw(c_w = result_fold$c_w,filter_statistics = filter_statistics,fdr =fdr)
-        SS_f1 = c(SS_f1,S_f$S);
+    if (B == 1) {
+      SS[[i]] <- result_fold$S
+      SS1 <- c(SS1, result_fold$S)
+      FP[[i]] <- result_fold$FDRPower
+      if (!is.null(filter_statistics)) {
+        S_f <- filter_cw(c_w = result_fold$c_w, filter_statistics = filter_statistics, fdr = fdr)
+        SS_f1 <- c(SS_f1, S_f$S)
       }
-      if(I){
-        S_I <- inter_cw(c_w = result_fold$c_w,b_1 = NULL,fdr = fdr)
-        SS_I1 <- c(SS_I1,S_I$S)
+      if (I) {
+        S_I <- inter_cw(c_w = result_fold$c_w, b_1 = NULL, fdr = fdr)
+        SS_I1 <- c(SS_I1, S_I$S)
       }
-
-    }else{
-      combine_1 = result_fold$combine_1
-      Bstat <- ifelse(is.null(combine_1),2,1)
-      SS1 = c(SS1,result_fold$S);
-      FP[[i]] = result_fold$FDRPower
-      if(!is.null(filter_statistics)){
-        S_f <- filter_cw_B(Bstat = Bstat, combine_1 = combine_1, c_w = result_fold$c_w_pis, e_w = result_fold$e_value,
-                           filter_statistics = filter_statistics, B = result_fold$B,fdr = fdr)
+    } else {
+      combine_1 <- result_fold$combine_1
+      Bstat <- ifelse(is.null(combine_1), 2, 1)
+      SS1 <- c(SS1, result_fold$S)
+      FP[[i]] <- result_fold$FDRPower
+      if (!is.null(filter_statistics)) {
+        S_f <- filter_cw_B(
+          Bstat = Bstat, combine_1 = combine_1, c_w = result_fold$c_w_pis, e_w = result_fold$e_value,
+          filter_statistics = filter_statistics, B = result_fold$B, fdr = fdr
+        )
         # SS_f[[i]] <- S_f$S;
-        SS_f1 = c(SS_f1,S_f$S);
+        SS_f1 <- c(SS_f1, S_f$S)
       }
     }
   }
-  if(B == 1){
-    return(list(SS1 = SS1, FP = FP, SS_f1 = SS_f1,SS_I1 = SS_I1))
-  }else{
+  if (B == 1) {
+    return(list(SS1 = SS1, FP = FP, SS_f1 = SS_f1, SS_I1 = SS_I1))
+  } else {
     return(list(SS1 = SS1, FP = FP, SS_f1 = SS_f1, Bstat = Bstat, combine_1 = combine_1))
   }
-
 }
 
 
@@ -469,90 +470,87 @@ result_cv <- function(r_SKMSD_cv, B=1, filter_statistics = NULL,I = F){
 #'
 #' @examples
 SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var = NULL, fdr = 0.2, offset = 1,
-                        method = 'ZIPG', test_statistic = 'DE', filter_statistics = 3, test1 = "wilcox.test"){
-  if (!requireNamespace(ZIPG, quietly = TRUE)) {
-    devtools::install_github("roulan2000/ZIPG")
-  }
-  if (!requireNamespace(scDesign2, quietly = TRUE)) {
-    devtools::install_github("JSB-UCLA/scDesign2")
-  }
-  if (!requireNamespace(knockoff, quietly = TRUE)) {
-    install.packages(knockoff)
-  }
+                        method = "ZIPG", test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test") {
+  if (!require(ZIPG)) devtools::install_github("roulan2000/ZIPG")
+  if (!require(scDesign2)) devtools::install_github("JSB-UCLA/scDesign2")
+  if (!require(knockoff)) install.packages(knockoff)
   library(ZIPG)
   library(scDesign2)
   library(knockoff)
 
-  if(is.null(class_K)){
-    class_K <- rep(1,dim(W)[1])
+  if (is.null(class_K)) {
+    class_K <- rep(1, dim(W)[1])
   }
-  if(is.null(data_x)){# sum(data_x) == 1
-    data_x <- as.data.frame(W[,c(1:3)])
+  if (is.null(data_x)) { # sum(data_x) == 1
+    data_x <- as.data.frame(W[, c(1:3)])
     data_x[data_x != 0] <- 0
   }
-  if(is.null(M)){
-    M <- apply(W,1,sum)
+  if (is.null(M)) {
+    M <- apply(W, 1, sum)
   }
-  name_data = names(table(class_K))
-  if(method == 'ZIPG'){
+  name_data <- names(table(class_K))
+  if (method == "ZIPG") {
     model_K <- list()
-    c = 1
-    for(k in name_data){
-      W_k <- W[class_K==k,]
-      data_x_k <- data_x[class_K==k,]
-      M_k <- M[class_K==k]
+    c <- 1
+    for (k in name_data) {
+      W_k <- W[class_K == k, ]
+      data_x_k <- data_x[class_K == k, ]
+      M_k <- M[class_K == k]
 
-      copula_result <- ZIPG_Estimate_3_1(data_x_k,W_k,M_k)
+      copula_result <- ZIPG_Estimate_3_1(data_x_k, W_k, M_k)
       model_K[[c]] <- copula_result
       c <- c + 1
     }
   }
 
   c_w <- c()
-  for(k1 in 1:length(name_data)){
-    sub <- class_K==name_data[k1]
-    W_k <- W[sub,]
-    data_x_k <- data_x[sub,]
+  for (k1 in 1:length(name_data)) {
+    sub <- class_K == name_data[k1]
+    W_k <- W[sub, ]
+    data_x_k <- data_x[sub, ]
     M_k <- M[sub]
     y_k <- y[sub]
 
-    if(method == 'ZIPG'){
-      copula_result = model_K[[k1]]
-      W_k_1 <- simulate_count_copula_3(copula_result,data_x_k,M_k)
-    }else if(method == 'knockoff'){
+    if (method == "ZIPG") {
+      copula_result <- model_K[[k1]]
+      W_k_1 <- simulate_count_copula_3(copula_result, data_x_k, M_k)
+    } else if (method == "knockoff") {
       random_m <- matrix(runif(dim(W_k)[1] * dim(W_k)[2], min = 0, max = 1), nrow = dim(W_k)[1])
       # W_k_1 <- W_k_1 + random_m
       W_k <- W_k + random_m
-      result_konckoffs1 <- knockoff.filter(W_k, y_k, knockoffs = create.second_order,
-                                           statistic = stat.random_forest,fdr=fdr)
+      result_konckoffs1 <- knockoff.filter(W_k, y_k,
+        knockoffs = create.second_order,
+        statistic = stat.random_forest, fdr = fdr
+      )
       W_k_1 <- result_konckoffs1$Xk # + random_m
       W_k <- W_k - random_m
-    }else if(method == 'ZINB'){
-      W_k_1 <- scDesign2_simulation(W_k,y_k)
+    } else if (method == "ZINB") {
+      W_k_1 <- scDesign2_simulation(W_k, y_k)
     }
 
-    if(test_statistic == 'DE'){
-      c_w_k <- contrast_score_computation(W_k,W_k_1,y_k,test1)
-    }else if(test_statistic == 'GLM'){
+    if (test_statistic == "DE") {
+      c_w_k <- contrast_score_computation(W_k, W_k_1, y_k, test1)
+    } else if (test_statistic == "GLM") {
       # test_statistic1 <- stat.glmnet_coefdiff
       random_m <- matrix(runif(dim(W_k)[1] * dim(W_k)[2], min = 0, max = 1), nrow = dim(W_k)[1])
       W_k_1 <- W_k_1 + random_m
       W_k <- W_k + random_m
-      c_w_k  <- stat.glmnet_coefdiff(W_k, W_k_1, y_k)
-    }else if(test_statistic == 'RF'){
+      c_w_k <- stat.glmnet_coefdiff(W_k, W_k_1, y_k)
+    } else if (test_statistic == "RF") {
       # test_statistic1 <- stat.random_forest
-      c_w_k  <- stat.random_forest(W_k, W_k_1, y_k)
+      c_w_k <- stat.random_forest(W_k, W_k_1, y_k)
     }
-    c_w <- rbind(c_w,c_w_k)
+    c_w <- rbind(c_w, c_w_k)
   }
   # print(c_w)
-  if(k1 == 1){
-    c_w_b = c_w
-  }else{
+  if (k1 == 1) {
+    c_w_b <- c_w
+  } else {
     c_w_b <- switch(filter_statistics,
-                    apply(c_w, 2, cumprod)[dim(c_w)[1],],
-                    apply(c_w, 2, max),
-                    apply(c_w, 2, sum))
+      apply(c_w, 2, cumprod)[dim(c_w)[1], ],
+      apply(c_w, 2, max),
+      apply(c_w, 2, sum)
+    )
   }
 
   result_fdr <- clipper_BC_2(c_w_b, fdr)
@@ -562,8 +560,8 @@ SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T
   # if(!is.null(T_var)){
   #   FDRPower <- FDR_Power(S,T_var)
   # }
-  FDRPower <- FDR_Power(S,T_var)
-  FDRPower <- c(result_fdr$FDR,FDRPower$FP)
+  FDRPower <- FDR_Power(S, T_var)
+  FDRPower <- c(result_fdr$FDR, FDRPower$FP)
   return(list(fdr = fdr, c_w = c_w, c_w_b = c_w_b, S = S, FDRPower = FDRPower))
 }
 
@@ -590,113 +588,109 @@ SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T
 #'
 #' @examples
 SKMSD_B_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var = NULL, fdr = 0.2, offset = 1,
-                          method = 'ZIPG', B = 1, Bstat = 2, test_statistic = 'DE', filter_statistics = 3, test1 = "wilcox.test",
-                          combine_1 = 'simul' ){
-
-  if (!requireNamespace(ZIPG, quietly = TRUE)) {
-    devtools::install_github("roulan2000/ZIPG")
-  }
-  if (!requireNamespace(scDesign2, quietly = TRUE)) {
-    devtools::install_github("JSB-UCLA/scDesign2")
-  }
-  if (!requireNamespace(knockoff, quietly = TRUE)) {
-    install.packages(knockoff)
-  }
+                          method = "ZIPG", B = 1, Bstat = 2, test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test",
+                          combine_1 = "simul") {
+  if (!require(ZIPG)) devtools::install_github("roulan2000/ZIPG")
+  if (!require(scDesign2)) devtools::install_github("JSB-UCLA/scDesign2")
+  if (!require(knockoff)) install.packages("knockoff")
   library(ZIPG)
   library(scDesign2)
   library(knockoff)
 
-  if(is.null(class_K)){
-    class_K <- rep(1,dim(W)[1])
+  if (is.null(class_K)) {
+    class_K <- rep(1, dim(W)[1])
   }
-  if(is.null(data_x)){# sum(data_x) == 1
-    data_x <- as.data.frame(W[,c(1:3)])
+  if (is.null(data_x)) { # sum(data_x) == 1
+    data_x <- as.data.frame(W[, c(1:3)])
     data_x[data_x != 0] <- 0
   }
-  if(is.null(M)){
-    M <- apply(W,1,sum)
+  if (is.null(M)) {
+    M <- apply(W, 1, sum)
   }
-  name_data = names(table(class_K))
-  if(method == 'ZIPG'){
+  name_data <- names(table(class_K))
+  if (method == "ZIPG") {
     model_K <- list()
-    c = 1
-    for(k in name_data){
+    c <- 1
+    for (k in name_data) {
       # print(c)
-      W_k <- W[class_K==k,]
-      data_x_k <- data_x[class_K==k,]
-      M_k <- M[class_K==k]
-      copula_result <- ZIPG_Estimate_3_1(data_x_k,W_k,M_k)
+      W_k <- W[class_K == k, ]
+      data_x_k <- data_x[class_K == k, ]
+      M_k <- M[class_K == k]
+      copula_result <- ZIPG_Estimate_3_1(data_x_k, W_k, M_k)
       model_K[[c]] <- copula_result
       c <- c + 1
     }
   }
 
   c_w <- e_w <- e_w_Bk <- c()
-  for(k1 in 1:length(name_data)){
-    sub <- class_K==name_data[k1]
-    W_k <- W[sub,]
-    data_x_k <- data_x[sub,]
+  for (k1 in 1:length(name_data)) {
+    sub <- class_K == name_data[k1]
+    W_k <- W[sub, ]
+    data_x_k <- data_x[sub, ]
     M_k <- M[sub]
     y_k <- y[sub]
     # copula_result = model_K[[k1]]
 
     e_w_B <- c_w_B <- c()
-    for(b in 1:B){
+    for (b in 1:B) {
       # W_k_1 <- simulate_count_copula_3(copula_result,data_x_k,M_k)
       # cat('k1',k1,'b',b,'\n')
-      if(method == 'ZIPG'){
-        copula_result = model_K[[k1]]
-        W_k_1 <- simulate_count_copula_3(copula_result,data_x_k,M_k)
-      }else if(method == 'knockoff'){
+      if (method == "ZIPG") {
+        copula_result <- model_K[[k1]]
+        W_k_1 <- simulate_count_copula_3(copula_result, data_x_k, M_k)
+      } else if (method == "knockoff") {
         random_m <- matrix(runif(dim(W_k)[1] * dim(W_k)[2], min = 0, max = 1), nrow = dim(W_k)[1])
         # W_k_1 <- W_k_1 + random_m
         W_k <- W_k + random_m
-        result_konckoffs1 <- knockoff.filter(W_k, y_k, knockoffs = create.second_order,
-                                             statistic = stat.random_forest,fdr=fdr)
+        result_konckoffs1 <- knockoff.filter(W_k, y_k,
+          knockoffs = create.second_order,
+          statistic = stat.random_forest, fdr = fdr
+        )
         W_k_1 <- result_konckoffs1$Xk # + random_m
         W_k <- W_k - random_m
-      }else if(method == 'ZINB'){
-        W_k_1 <- scDesign2_simulation(W_k,y_k)
+      } else if (method == "ZINB") {
+        W_k_1 <- scDesign2_simulation(W_k, y_k)
       }
 
-      if(test_statistic == 'DE'){
-        c_w_k <- contrast_score_computation(W_k,W_k_1,y_k,test1)
-      }else if(test_statistic == 'GLM'){
+      if (test_statistic == "DE") {
+        c_w_k <- contrast_score_computation(W_k, W_k_1, y_k, test1)
+      } else if (test_statistic == "GLM") {
         # test_statistic1 <- stat.glmnet_coefdiff
         random_m <- matrix(runif(dim(W_k)[1] * dim(W_k)[2], min = 0, max = 1), nrow = dim(W_k)[1])
         W_k_1 <- W_k_1 + random_m
         W_k <- W_k + random_m
-        c_w_k  <- stat.glmnet_coefdiff(W_k, W_k_1, y_k)
-      }else if(test_statistic == 'RF'){
+        c_w_k <- stat.glmnet_coefdiff(W_k, W_k_1, y_k)
+      } else if (test_statistic == "RF") {
         test_statistic1 <- stat.random_forest
-        c_w_k  <- test_statistic1(W_k, W_k_1, y_k)
+        c_w_k <- test_statistic1(W_k, W_k_1, y_k)
       }
-      c_w_B <- rbind(c_w_B,c_w_k)
+      c_w_B <- rbind(c_w_B, c_w_k)
 
-      gamma <- fdr/2
+      gamma <- fdr / 2
       offset <- 1
       e_w_b <- ekn(c_w_k, gamma, offset)
-      e_w_B <- rbind(e_w_B,e_w_b)
+      e_w_B <- rbind(e_w_B, e_w_b)
     }
-    e_w_Bk <- rbind(e_w_Bk,e_w_B)
-    c_w <- rbind(c_w,c_w_B)
+    e_w_Bk <- rbind(e_w_Bk, e_w_B)
+    c_w <- rbind(c_w, c_w_B)
 
-    e_w_B_k <- apply(e_w_B,2,mean)
-    e_w <- rbind(e_w,e_w_B_k)
+    e_w_B_k <- apply(e_w_B, 2, mean)
+    e_w <- rbind(e_w, e_w_B_k)
   }
 
-  if(B ==1){
+  if (B == 1) {
     # c_w_k <- switch(filter_statistics,
     #                 apply(c_w, 2, cumprod)[dim(c_w)[1],],
     #                 apply(c_w, 2, max),
     #                 apply(c_w, 2, sum))
-    if(k1 == 1){
-      c_w_k = c_w
-    }else{
+    if (k1 == 1) {
+      c_w_k <- c_w
+    } else {
       c_w_k <- switch(filter_statistics,
-                      apply(c_w, 2, cumprod)[dim(c_w)[1],],
-                      apply(c_w, 2, max),
-                      apply(c_w, 2, sum))
+        apply(c_w, 2, cumprod)[dim(c_w)[1], ],
+        apply(c_w, 2, max),
+        apply(c_w, 2, sum)
+      )
     }
     result_fdr <- clipper_BC_2(c_w_k, fdr)
     S <- result_fdr$discovery
@@ -705,18 +699,20 @@ SKMSD_B_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y,
     # if(!is.null(T_var)){
     #   FDRPower <- FDR_Power(S,T_var)
     # }
-    FDRPower <- FDR_Power(S,T_var)
-    FDRPower <- c(result_fdr$FDR,FDRPower$FP)
-    return(list(fdr = fdr, B = B, c_w_pis = c_w, contrast_score = c_w_k,
-                S = S, FDRPower = FDRPower))
-
-  }else if(Bstat == 1){
+    FDRPower <- FDR_Power(S, T_var)
+    FDRPower <- c(result_fdr$FDR, FDRPower$FP)
+    return(list(
+      fdr = fdr, B = B, c_w_pis = c_w, contrast_score = c_w_k,
+      S = S, FDRPower = FDRPower
+    ))
+  } else if (Bstat == 1) {
     # B test_statistics, mean; First k and then B; Finally K row E-value;
-    if(combine_1 == 'simul'){
+    if (combine_1 == "simul") {
       e_value_B <- switch(filter_statistics,
-                          apply(e_w, 2, cumprod)[dim(e_w)[1],],
-                          apply(e_w, 2, max),
-                          apply(e_w, 2, sum))
+        apply(e_w, 2, cumprod)[dim(e_w)[1], ],
+        apply(e_w, 2, max),
+        apply(e_w, 2, sum)
+      )
       result_fdr <- clipper_BC_2(e_value_B, fdr)
       S <- result_fdr$discovery
 
@@ -724,53 +720,60 @@ SKMSD_B_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y,
       # if(!is.null(T_var)){
       #   FDRPower <- FDR_Power(S,T_var)
       # }
-      FDRPower <- FDR_Power(S,T_var)
-      FDRPower <- c(result_fdr$FDR,FDRPower$FP)
-      return(list(fdr = fdr, B = B, c_w_pis = c_w, # contrast_score = c_w_B,
-                  e_value = e_w, e_value_B = e_value_B, combine_1 = combine_1,
-                  S = S, FDRPower = FDRPower))
-    }else if(combine_1 == 'fisher'){
+      FDRPower <- FDR_Power(S, T_var)
+      FDRPower <- c(result_fdr$FDR, FDRPower$FP)
+      return(list(
+        fdr = fdr, B = B, c_w_pis = c_w, # contrast_score = c_w_B,
+        e_value = e_w, e_value_B = e_value_B, combine_1 = combine_1,
+        S = S, FDRPower = FDRPower
+      ))
+    } else if (combine_1 == "fisher") {
       p_e_w <- e_w
       p_e_w[p_e_w == 0] <- 1
-      p_comb <- apply(-2*log(1/p_e_w),2,sum)
-      chis <- qchisq(fdr, 2*length(name_data), lower.tail = FALSE)
-      S <- which(p_comb>chis)
+      p_comb <- apply(-2 * log(1 / p_e_w), 2, sum)
+      chis <- qchisq(fdr, 2 * length(name_data), lower.tail = FALSE)
+      S <- which(p_comb > chis)
 
       # FDRPower = NULL
       # if(!is.null(T_var)){
       #   FDRPower <- FDR_Power(S,T_var)
       # }
-      FDRPower <- FDR_Power(S,T_var)
-      FDRPower <- c(fdr,FDRPower$FP)
-      return(list(fdr = fdr, B = B, c_w_pis = c_w, chis = chis,
-                  e_value = e_w, p_comb = p_comb, combine_1 = combine_1,
-                  S = S, FDRPower = FDRPower))
+      FDRPower <- FDR_Power(S, T_var)
+      FDRPower <- c(fdr, FDRPower$FP)
+      return(list(
+        fdr = fdr, B = B, c_w_pis = c_w, chis = chis,
+        e_value = e_w, p_comb = p_comb, combine_1 = combine_1,
+        S = S, FDRPower = FDRPower
+      ))
     }
-  }else if(Bstat == 2){
+  } else if (Bstat == 2) {
     # B filter_statistics, mean; First b and then K; Finally B row E-value;
     e_w_B <- c()
-    for(b in 1:B){
-      c_w_bK <- c_w[seq(b,length(name_data)*B+b-1,B),] # t:11:((n_k*T)+t-1)
+    for (b in 1:B) {
+      c_w_bK <- c_w[seq(b, length(name_data) * B + b - 1, B), ] # t:11:((n_k*T)+t-1)
       c_w_b <- switch(filter_statistics,
-                      apply(c_w_bK, 2, cumprod)[dim(c_w_bK)[1],],
-                      apply(c_w_bK, 2, max),
-                      apply(c_w_bK, 2, sum))
-      gamma <- fdr/2
+        apply(c_w_bK, 2, cumprod)[dim(c_w_bK)[1], ],
+        apply(c_w_bK, 2, max),
+        apply(c_w_bK, 2, sum)
+      )
+      gamma <- fdr / 2
       offset <- 1
       e_w_b <- ekn(c_w_b, gamma, offset)
-      e_w_B <- rbind(e_w_B,e_w_b)
+      e_w_B <- rbind(e_w_B, e_w_b)
     }
-    e_value_B <- apply(e_w_B,2,mean)
+    e_value_B <- apply(e_w_B, 2, mean)
     result_ebh <- ebh_2(e_value_B, fdr)
     S <- result_ebh$discovery
     # FDRPower = NULL
     # if(!is.null(T_var)){
     #   FDRPower <- FDR_Power(S,T_var)
     # }
-    FDRPower <- FDR_Power(S,T_var)
-    FDRPower <- c(result_ebh$FDR,FDRPower$FP)
-    return(list(fdr = fdr, B = B, c_w_pis = c_w, e_w_B = e_w_B, e_value = e_value_B,
-                S = S, FDRPower = FDRPower))
+    FDRPower <- FDR_Power(S, T_var)
+    FDRPower <- c(result_ebh$FDR, FDRPower$FP)
+    return(list(
+      fdr = fdr, B = B, c_w_pis = c_w, e_w_B = e_w_B, e_value = e_value_B,
+      S = S, FDRPower = FDRPower
+    ))
   }
 }
 

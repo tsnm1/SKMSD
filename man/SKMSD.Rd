@@ -39,7 +39,7 @@ SKMSD(
 
 \item{filter_statistics}{The statistics of the dataset were calculated from multiple sources. Denote c(cumprod,max, sum) by 1,2,3;}
 
-\item{test1}{Test method, select when selecting 'DE', default is "wilcox.test".}
+\item{test1}{Test method, select when selecting 'DE', default is "wilcox.test", c("wilcox.test",'ks.test','mmd','distance_JS').}
 }
 \value{
 c_w: Results of test statistics for multiple single-source datasets;
