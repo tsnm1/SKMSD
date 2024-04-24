@@ -17,6 +17,10 @@ Poisson–Gamma (ZIPG) distribution for knockoff generation. It is
 combined with the Simultaneous Knockoff method to address variable
 selection in multi-source data.
 
+The research conducted in this project is based on the preprint paper
+titled “SKMCD: A Novel Knockoff Method for Empowering Multi-Source Count
+Data”.
+
 ## Installation
 
 You can install the development version of SKMSD from
@@ -50,9 +54,9 @@ n_w <- dim(W)[1]
 n_data <- 2
 y <- rep(rep(c(1, 2), n_data), rep(n_w / 2 / n_data, n_data * 2))
 class_K <- rep(c(1:n_data), rep(n_w / n_data, n_data))
-n_p_all = c(50, 100, 400)
-n_p = c(10, 20, 40)
-T_var = 1:n_p[i]
+n_p_all <- c(50, 100, 400)
+n_p <- c(10, 20, 40)
+T_var <- 1:n_p[i]
 name_data <- names(table(class_K))
 fdr <- 0.2
 

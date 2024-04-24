@@ -9,6 +9,3 @@
 #' }
 #' @source 'simulate_datasets_3'
 "data_pg_copula"
-
-
-
