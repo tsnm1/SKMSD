@@ -5,8 +5,7 @@ Authors@R:
     person("Shan", "Tang", , "tangshanhaha@hnu.edu.cn", role = c("aut", "cre"),
            comment = c(ORCID = "0009-0003-2196-3201"))
 Description: A novel knockoff method for enhancing multi-source count data is proposed. This method is primarily based on the Gaussian copula framework of the zero-inflated Poisson–Gamma (ZIPG) distribution for knockoff generation, and is combined with the Simultaneous Knockoff method to address variable selection in multi-source data.
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

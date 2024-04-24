@@ -24,7 +24,7 @@
 #' i = 1 # or 2
 #' data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
 #' count_K_j = data_K_j    #[data_K_j[,1]==c,]
-#' n_x1 <- ifelse(n_x1==0, 3, n_x1)
+#' n_x1 <- 3
 #' data_x <- as.data.frame(count_K_j[,c(1:n_x1+1)])
 #' W <- as.data.frame(count_K_j[,-c(1:(n_x1+2))])
 #' M <- count_K_j[,n_x1+2]
@@ -492,17 +492,19 @@ result_cv <- function(r_SKMSD_cv, B = 1, filter_statistics = NULL, I = F) {
 #'
 #' @examples
 #'
+#' data(data_pg_copula)
 #' i = 1 # or 2
 #' data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
 #' count_K_j = data_K_j    # [data_K_j[,1]==c,]
-#' n_x1 <- ifelse(n_x1==0, 3, n_x1)
+#' n_x1 <- 3
 #' data_x <- as.data.frame(count_K_j[,c(1:n_x1+1)])
 #' W <- as.data.frame(count_K_j[,-c(1:(n_x1+2))])
 #' M <- count_K_j[,n_x1+2]
 #' n_w <- dim(W)[1]
+#' n_data = 2
 #' y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
 #' class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
-#' T_var = 1:(n_p[j])
+#' T_var = 1:(dim(W)[2]/10)
 #' name_data <- names(table(class_K))
 #' fdr = 0.2
 #'
@@ -632,17 +634,19 @@ SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T
 #'
 #' @examples
 #'
+#' data(data_pg_copula)
 #' i = 1 # or 2
 #' data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
 #' count_K_j = data_K_j    # [data_K_j[,1]==c,]
-#' n_x1 <- ifelse(n_x1==0, 3, n_x1)
+#' n_x1 <- 3
 #' data_x <- as.data.frame(count_K_j[,c(1:n_x1+1)])
 #' W <- as.data.frame(count_K_j[,-c(1:(n_x1+2))])
 #' M <- count_K_j[,n_x1+2]
 #' n_w <- dim(W)[1]
+#' n_data = 2
 #' y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
 #' class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
-#' T_var = 1:(n_p[j])
+#' T_var = 1:(dim(W)[2]/10)
 #' name_data <- names(table(class_K))
 #' fdr = 0.2
 #' B = 10
