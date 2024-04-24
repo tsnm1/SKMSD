@@ -38,24 +38,26 @@ Extension of SKMSD_B to consider more synthetic data methods.
 \examples{
 
 data(data_pg_copula)
-i = 1 # or 2
+i <- 1 # or 2
 data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
-count_K_j = data_K_j    # [data_K_j[,1]==c,]
+count_K_j <- data_K_j # [data_K_j[,1]==c,]
 n_x1 <- 3
-data_x <- as.data.frame(count_K_j[,c(1:n_x1+1)])
-W <- as.data.frame(count_K_j[,-c(1:(n_x1+2))])
-M <- count_K_j[,n_x1+2]
+data_x <- as.data.frame(count_K_j[, c(1:n_x1 + 1)])
+W <- as.data.frame(count_K_j[, -c(1:(n_x1 + 2))])
+M <- count_K_j[, n_x1 + 2]
 n_w <- dim(W)[1]
-n_data = 2
-y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
-class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
-T_var = 1:20 # i = 2; T_var = 1:40
+n_data <- 2
+y <- rep(rep(c(1, 2), n_data), rep(n_w / 2 / n_data, n_data * 2))
+class_K <- rep(c(1:n_data), rep(n_w / n_data, n_data))
+T_var <- 1:20 # i = 2; T_var = 1:40
 name_data <- names(table(class_K))
-fdr = 0.2
-B = 10
+fdr <- 0.2
+B <- 10
 
-ZIPG_DE_S3_B2 <- SKMSD_B_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y,T_var = T_var, fdr = fdr, method = 'ZIPG',
-                               B = B, Bstat = 1, test_statistic = 'DE', filter_statistics = 3, combine_1 = 'simul')
+ZIPG_DE_S3_B2 <- SKMSD_B_other(
+  W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var, fdr = fdr, method = "ZIPG",
+  B = B, Bstat = 1, test_statistic = "DE", filter_statistics = 3, combine_1 = "simul"
+)
 ZIPG_DE_S3$S
 ZIPG_DE_S3$FDRPower
 
