@@ -1,26 +1,23 @@
+---
+output: github_document
+---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+
 
 # SKMSD
 
 <!-- badges: start -->
-
 [![R-CMD-check](https://github.com/tsnm1/SKMSD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tsnm1/SKMSD/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/tsnm1/SKMSD/branch/main/graph/badge.svg)](https://app.codecov.io/gh/tsnm1/SKMSD?branch=main)
+[![Codecov test coverage](https://codecov.io/gh/tsnm1/SKMSD/branch/main/graph/badge.svg)](https://app.codecov.io/gh/tsnm1/SKMSD?branch=main)
 <!-- badges: end -->
 
-Simultaneous Knockoff for Multi-Source Count Data (SKMSD) is a novel
-method proposed for enhancing multi-source count data. This method is
-primarily based on the Gaussian copula framework of the zero-inflated
-Poisson–Gamma (ZIPG) distribution for knockoff generation. It is
-combined with the Simultaneous Knockoff method to address variable
-selection in multi-source data.
+Simultaneous Knockoff for Multi-Source Count Data (SKMSD) is a novel method proposed for enhancing multi-source count data. This method is primarily based on the Gaussian copula framework of the zero-inflated Poisson–Gamma (ZIPG) distribution for knockoff generation. It is combined with the Simultaneous Knockoff method to address variable selection in multi-source data. 
 
 ## Installation
 
-You can install the development version of SKMSD from
-[GitHub](https://github.com/) with:
+You can install the development version of SKMSD from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("devtools")
@@ -29,10 +26,10 @@ devtools::install_github("tsnm1/SKMSD")
 
 ## Example
 
-Here is a basic example of how to solve a common problem in variable
-selection during the implementation of SKMSD:
+Here is a basic example of how to solve a common problem in variable selection during the implementation of SKMSD:
 
-``` r
+
+```r
 # library(SKMSD)
 # library(pscl)
 
@@ -60,13 +57,13 @@ fdr = 0.2
 # ZIPG_DE_S3$FDRPower
 ```
 
+
 ## Simulated data generation
 
-In general, our package also includes a function (simulate_datasets_3)
-that can simulate the generation of multi-source count data. An example
-is provided below:
+In general, our package also includes a function (simulate_datasets_3) that can simulate the generation of multi-source count data. An example is provided below:
 
-``` r
+
+```r
 # data_pg_copula <- simulate_datasets_3(
 #   times = 1, n_data = 2, n_1_all = c(400, 400), n_p_all = c(400, 800), n_p = c(40, 80),
 #   diff = 0, prob_max = 0.5, marginal1 = "pg", copula1 = TRUE, fc1 = 1,
@@ -76,8 +73,11 @@ is provided below:
 ```
 
 <!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. -->
+
 <!-- You can also embed plots, for example: -->
+
 <!-- ```{r pressure, echo = FALSE} -->
 <!-- # plot(pressure) -->
 <!-- ``` -->
+
 <!-- In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN. -->
