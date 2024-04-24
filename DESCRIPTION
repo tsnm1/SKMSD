@@ -1,10 +1,10 @@
 Package: SKMSD
-Title: What the Package Does (One Line, Title Case)
+Title: Simultaneous knockoff for multi-source count data.
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Shan", "Tang", , "tangshanhaha@hnu.edu.cn", role = c("aut", "cre"),
+           comment = c(ORCID = "0009-0003-2196-3201"))
+Description: A novel knockoff method for enhancing multi-source count data is proposed. This method is primarily based on the Gaussian copula framework of the zero-inflated Poisson–Gamma (ZIPG) distribution for knockoff generation, and is combined with the Simultaneous Knockoff method to address variable selection in multi-source data.
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
