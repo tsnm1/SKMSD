@@ -72,7 +72,7 @@ is provided below:
 #   diff = 0, prob_max = 0.5, marginal1 = "pg", copula1 = TRUE, fc1 = 1,
 # )
 # i = 1 # i = 1,2;
-# W = data_pg_copula[[1]][[1]][[i]][[1]][[1]] # i = 1,2;
+# data_K_j = data_pg_copula[[1]][[1]][[i]][[1]][[1]] # i = 1,2;
 ```
 
 <!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. -->

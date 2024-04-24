@@ -25,7 +25,7 @@
 #'   times = 1, n_data = 2, n_1_all = c(400, 400), n_p_all = c(400, 800), n_p = c(40, 80),
 #'   diff = 0, prob_max = 0.5, marginal1 = "pg", copula1 = TRUE, fc1 = 1,
 #' )
-#' W = data_pg_copula[[1]][[1]][[i]][[1]][[1]] # i = 1,2;
+#' data_K_j = data_pg_copula[[1]][[1]][[i]][[1]][[1]] # i = 1,2;
 #'
 simulate_datasets_3 <- function(times = 1, n_data = 2, n_1_all = c(400, 400),
                                 n_p_all = c(200, 400, 600, 800), n_p = c(20, 40, 60, 80),
