@@ -63,15 +63,13 @@ M <- count_K_j[,n_x1+2]
 n_w <- dim(W)[1]
 y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
 class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
-T_var = 1:(n_p[j])
+T_var = 1:20 # i = 2; T_var = 1:40
 name_data <- names(table(class_K))
 fdr = 0.2
 
 ZIPG_DE_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
                    fdr = fdr, test_statistic = 'DE', filter_statistics = 3)
-ZIPG_GLM_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
-                     fdr = fdr, test_statistic = 'GLM', filter_statistics = 3)
-ZIPG_RF_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
-                    fdr = fdr, test_statistic = 'RF', filter_statistics = 3)
+ZIPG_DE_S3$S
+ZIPG_DE_S3$FDRPower
 
 }

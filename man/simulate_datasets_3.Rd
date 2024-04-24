@@ -16,7 +16,7 @@ simulate_datasets_3(
   n_x1 = 3,
   rho_x = 0.1,
   M_max = 100,
-  fc1 = 2,
+  fc1 = 1,
   marginal1 = "pg",
   copula1 = TRUE
 )
@@ -60,7 +60,7 @@ Generation of simulated count data.
 \examples{
 data_pg_copula <- simulate_datasets_3(
   times = 1, n_data = 2, n_1_all = c(400, 400), n_p_all = c(400, 800), n_p = c(40, 80),
-  diff = 0, prob_max = 0.5, marginal1 = "pg", copula1 = TRUE
+  diff = 0, prob_max = 0.5, marginal1 = "pg", copula1 = TRUE, fc1 = 1,
 )
 W = data_pg_copula[[1]][[1]][[i]][[1]][[1]] # i = 1,2;
 

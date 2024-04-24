@@ -32,16 +32,14 @@
 #' n_w <- dim(W)[1]
 #' y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
 #' class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
-#' T_var = 1:(n_p[j])
+#' T_var = 1:20 # i = 2; T_var = 1:40
 #' name_data <- names(table(class_K))
 #' fdr = 0.2
 #'
 #' ZIPG_DE_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
 #'                    fdr = fdr, test_statistic = 'DE', filter_statistics = 3)
-#' ZIPG_GLM_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
-#'                      fdr = fdr, test_statistic = 'GLM', filter_statistics = 3)
-#' ZIPG_RF_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
-#'                     fdr = fdr, test_statistic = 'RF', filter_statistics = 3)
+#' ZIPG_DE_S3$S
+#' ZIPG_DE_S3$FDRPower
 #'
 SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_var = 1, fdr = 0.2, offset = 1,
                   test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test") {
@@ -499,17 +497,12 @@ result_cv <- function(r_SKMSD_cv, B = 1, filter_statistics = NULL, I = F) {
 #' n_data = 2
 #' y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
 #' class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
-#' T_var = 1:(dim(W)[2]/10)
+#' T_var = 1:20 # i = 2; T_var = 1:40
 #' name_data <- names(table(class_K))
 #' fdr = 0.2
 #'
 #'  ZIPG_DE_S3 <- SKMSD_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
 #'                            fdr = fdr, method = 'ZIPG', test_statistic = 'DE', filter_statistics = 3)
-#' ZIPG_GLM_S3 <- SKMSD_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
-#'                            fdr = fdr, offset = 1, method = 'ZIPG', test_statistic = 'GLM', filter_statistics = 3)
-#' ZIPG_RF_S3 <- SKMSD_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
-#'                           fdr = fdr, offset = 1, method = 'ZIPG', test_statistic = 'RF', filter_statistics = 3)
-#'
 SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var = NULL, fdr = 0.2, offset = 1,
                         method = "ZIPG", test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test") {
   if (!require(ZIPG)) devtools::install_github("roulan2000/ZIPG")
@@ -641,17 +634,15 @@ SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T
 #' n_data = 2
 #' y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
 #' class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
-#' T_var = 1:(dim(W)[2]/10)
+#' T_var = 1:20 # i = 2; T_var = 1:40
 #' name_data <- names(table(class_K))
 #' fdr = 0.2
 #' B = 10
 #'
 #' ZIPG_DE_S3_B2 <- SKMSD_B_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y,T_var = T_var, fdr = fdr, method = 'ZIPG',
 #'                                B = B, Bstat = 1, test_statistic = 'DE', filter_statistics = 3, combine_1 = 'simul')
-#' ZIPG_GLM_S3_B2 <- SKMSD_B_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var, fdr = fdr, method = 'ZIPG',
-#'                                 B = B, Bstat = 1, test_statistic = 'GLM', filter_statistics = 3, combine_1 = 'simul')
-#' ZIPG_RF_S3_B2 <- SKMSD_B_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y,T_var = T_var, fdr = fdr, method = 'ZIPG',
-#'                                B = B, Bstat = 1, test_statistic = 'RF', filter_statistics = 3, combine_1 = 'simul')
+#' ZIPG_DE_S3$S
+#' ZIPG_DE_S3$FDRPower
 #'
 SKMSD_B_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var = NULL, fdr = 0.2, offset = 1,
                           method = "ZIPG", B = 1, Bstat = 2, test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test",

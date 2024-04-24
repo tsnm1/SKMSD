@@ -16,7 +16,7 @@ simulate_PG_6(
   n_x = 3,
   rho_x = 0.1,
   M_max = 100,
-  fc = 2,
+  fc = 1,
   marginal = c("nb", "pg"),
   copula = TRUE,
   seed = 111
