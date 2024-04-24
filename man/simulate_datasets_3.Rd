@@ -12,6 +12,11 @@ simulate_datasets_3(
   n_p = c(20, 40, 60, 80),
   diff = seq(10, 60, 10),
   prob_max = seq(0.1, 0.9, 0.2),
+  rho_p = 0.5,
+  n_x1 = 3,
+  rho_x = 0.1,
+  M_max = 100,
+  fc1 = 2,
   marginal1 = "pg",
   copula1 = TRUE
 )
@@ -30,6 +35,16 @@ simulate_datasets_3(
 \item{diff}{The number of different significant variables in multi-source data sets was different;}
 
 \item{prob_max}{The maximum zero proportion of different count data;}
+
+\item{rho_p}{Calculation parameters of covariance matrix based on copula mode;}
+
+\item{n_x1}{Number of covariates;}
+
+\item{rho_x}{Parameters of the way in which the covariates were generated.}
+
+\item{M_max}{The mean value of count data;}
+
+\item{fc1}{Mean differences of significant variables in different distributions;}
 
 \item{marginal1}{The marginal distribution of the count data variable, c('nb','pg'), is actually a ZINB and ZIPG distribution with zero inflation.}
 

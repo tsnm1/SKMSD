@@ -7,6 +7,11 @@
 #' @param n_p The default number of significant variables was n_p = c(20, 40, 60, 80).
 #' @param diff The number of different significant variables in multi-source data sets was different;
 #' @param prob_max The maximum zero proportion of different count data;
+#' @param rho_p Calculation parameters of covariance matrix based on copula mode;
+#' @param n_x1 Number of covariates;
+#' @param rho_x Parameters of the way in which the covariates were generated.
+#' @param M_max The mean value of count data;
+#' @param fc1 Mean differences of significant variables in different distributions;
 #' @param marginal1 The marginal distribution of the count data variable, c('nb','pg'), is actually a ZINB and ZIPG distribution with zero inflation.
 #' @param copula1 Boolean value, whether to generate simulated data based on copula, defaults to TRUE.
 #'
@@ -20,10 +25,12 @@
 #'   times = 1, n_data = 2, n_1_all = c(400, 400), n_p_all = c(400, 800), n_p = c(40, 80),
 #'   diff = 0, prob_max = 0.5, marginal1 = "pg", copula1 = TRUE
 #' )
+#' W = data_pg_copula[[1]][[1]][[i][[1]]][[1]] # i = 1,2;
 #'
 simulate_datasets_3 <- function(times = 1, n_data = 2, n_1_all = c(400, 400),
                                 n_p_all = c(200, 400, 600, 800), n_p = c(20, 40, 60, 80),
                                 diff = seq(10, 60, 10), prob_max = seq(0.1, 0.9, 0.2),
+                                rho_p = 0.5, n_x1 = 3, rho_x = 0.1, M_max = 1e2, fc1 = 2,
                                 marginal1 = "pg", copula1 = TRUE) {
   data_list <- res_prob_0 <- list()
   for (i in c(1:times)) {
@@ -1334,3 +1341,6 @@ ekn <- function(C, gamma, offset) {
 
   return(E)
 }
+
+
+# devtools::document()
