@@ -68,7 +68,7 @@ is provided below:
 
 ``` r
 # data_pg_copula <- simulate_datasets_3(
-#   times = 1, n_data = 2, n_1_all = c(400, 400), n_p_all = c(400, 800), n_p = c(40, 80),
+#   times = 1, n_data = 2, n_1_all = c(400, 400), c(100, 400), n_p = c(20, 40),
 #   diff = 0, prob_max = 0.5, marginal1 = "pg", copula1 = TRUE, fc1 = 1,
 # )
 # i = 1 # i = 1,2;
