@@ -50,3 +50,27 @@ FDRPower: The resulting FDR and Power are calculated after given T_var.
 \description{
 Simultaneous knockoff for multi-source count data
 }
+\examples{
+
+i = 1 # or 2
+data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
+count_K_j = data_K_j    #[data_K_j[,1]==c,]
+n_x1 <- ifelse(n_x1==0, 3, n_x1)
+data_x <- as.data.frame(count_K_j[,c(1:n_x1+1)])
+W <- as.data.frame(count_K_j[,-c(1:(n_x1+2))])
+M <- count_K_j[,n_x1+2]
+n_w <- dim(W)[1]
+y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
+class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
+T_var = 1:(n_p[j])
+name_data <- names(table(class_K))
+fdr = 0.2
+
+ZIPG_DE_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+                   fdr = fdr, test_statistic = 'DE', filter_statistics = 3)
+ZIPG_GLM_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+                     fdr = fdr, test_statistic = 'GLM', filter_statistics = 3)
+ZIPG_RF_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+                    fdr = fdr, test_statistic = 'RF', filter_statistics = 3)
+
+}

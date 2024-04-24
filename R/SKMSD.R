@@ -20,6 +20,28 @@
 #' @export
 #'
 #' @examples
+#'
+#' i = 1 # or 2
+#' data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
+#' count_K_j = data_K_j    #[data_K_j[,1]==c,]
+#' n_x1 <- ifelse(n_x1==0, 3, n_x1)
+#' data_x <- as.data.frame(count_K_j[,c(1:n_x1+1)])
+#' W <- as.data.frame(count_K_j[,-c(1:(n_x1+2))])
+#' M <- count_K_j[,n_x1+2]
+#' n_w <- dim(W)[1]
+#' y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
+#' class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
+#' T_var = 1:(n_p[j])
+#' name_data <- names(table(class_K))
+#' fdr = 0.2
+#'
+#' ZIPG_DE_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+#'                    fdr = fdr, test_statistic = 'DE', filter_statistics = 3)
+#' ZIPG_GLM_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+#'                      fdr = fdr, test_statistic = 'GLM', filter_statistics = 3)
+#' ZIPG_RF_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+#'                     fdr = fdr, test_statistic = 'RF', filter_statistics = 3)
+#'
 SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_var = 1, fdr = 0.2, offset = 1,
                   test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test") {
   if (!requireNamespace(ZIPG, quietly = TRUE)) {
@@ -469,6 +491,28 @@ result_cv <- function(r_SKMSD_cv, B = 1, filter_statistics = NULL, I = F) {
 #' @export
 #'
 #' @examples
+#'
+#' i = 1 # or 2
+#' data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
+#' count_K_j = data_K_j    # [data_K_j[,1]==c,]
+#' n_x1 <- ifelse(n_x1==0, 3, n_x1)
+#' data_x <- as.data.frame(count_K_j[,c(1:n_x1+1)])
+#' W <- as.data.frame(count_K_j[,-c(1:(n_x1+2))])
+#' M <- count_K_j[,n_x1+2]
+#' n_w <- dim(W)[1]
+#' y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
+#' class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
+#' T_var = 1:(n_p[j])
+#' name_data <- names(table(class_K))
+#' fdr = 0.2
+#'
+#'  ZIPG_DE_S3 <- SKMSD_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+#'                            fdr = fdr, method = 'ZIPG', test_statistic = 'DE', filter_statistics = 3)
+#' ZIPG_GLM_S3 <- SKMSD_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+#'                            fdr = fdr, offset = 1, method = 'ZIPG', test_statistic = 'GLM', filter_statistics = 3)
+#' ZIPG_RF_S3 <- SKMSD_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+#'                           fdr = fdr, offset = 1, method = 'ZIPG', test_statistic = 'RF', filter_statistics = 3)
+#'
 SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var = NULL, fdr = 0.2, offset = 1,
                         method = "ZIPG", test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test") {
   if (!require(ZIPG)) devtools::install_github("roulan2000/ZIPG")
@@ -587,6 +631,29 @@ SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T
 #' @export
 #'
 #' @examples
+#'
+#' i = 1 # or 2
+#' data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
+#' count_K_j = data_K_j    # [data_K_j[,1]==c,]
+#' n_x1 <- ifelse(n_x1==0, 3, n_x1)
+#' data_x <- as.data.frame(count_K_j[,c(1:n_x1+1)])
+#' W <- as.data.frame(count_K_j[,-c(1:(n_x1+2))])
+#' M <- count_K_j[,n_x1+2]
+#' n_w <- dim(W)[1]
+#' y <- rep(rep(c(1,2),n_data),rep(n_w/2/n_data,n_data*2))
+#' class_K <- rep(c(1:n_data),rep(n_w/n_data,n_data))
+#' T_var = 1:(n_p[j])
+#' name_data <- names(table(class_K))
+#' fdr = 0.2
+#' B = 10
+#'
+#' ZIPG_DE_S3_B2 <- SKMSD_B_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y,T_var = T_var, fdr = fdr, method = 'ZIPG',
+#'                                B = B, Bstat = 1, test_statistic = 'DE', filter_statistics = 3, combine_1 = 'simul')
+#' ZIPG_GLM_S3_B2 <- SKMSD_B_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var, fdr = fdr, method = 'ZIPG',
+#'                                 B = B, Bstat = 1, test_statistic = 'GLM', filter_statistics = 3, combine_1 = 'simul')
+#' ZIPG_RF_S3_B2 <- SKMSD_B_other(W = W, class_K = class_K, data_x = data_x, M = M, y = y,T_var = T_var, fdr = fdr, method = 'ZIPG',
+#'                                B = B, Bstat = 1, test_statistic = 'RF', filter_statistics = 3, combine_1 = 'simul')
+#'
 SKMSD_B_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var = NULL, fdr = 0.2, offset = 1,
                           method = "ZIPG", B = 1, Bstat = 2, test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test",
                           combine_1 = "simul") {
