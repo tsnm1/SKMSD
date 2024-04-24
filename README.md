@@ -34,6 +34,8 @@ selection during the implementation of SKMSD:
 
 ``` r
 # library(SKMSD)
+# library(pscl)
+
 ## basic example code
 
 data(data_pg_copula)

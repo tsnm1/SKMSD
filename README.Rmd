@@ -36,7 +36,9 @@ devtools::install_github("tsnm1/SKMSD")
 Here is a basic example of how to solve a common problem in variable selection during the implementation of SKMSD:
 
 ```{r example}
-library(SKMSD)
+# library(SKMSD)
+# library(pscl)
+
 ## basic example code
 
 data(data_pg_copula)
@@ -55,8 +57,8 @@ T_var = 1:(dim(W)[2]/10)
 name_data <- names(table(class_K))
 fdr = 0.2
 
-ZIPG_DE_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
-                   fdr = fdr, test_statistic = 'DE', filter_statistics = 3)
+# ZIPG_DE_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
+#                    fdr = fdr, test_statistic = 'DE', filter_statistics = 3)
 # ZIPG_GLM_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
 #                      fdr = fdr, test_statistic = 'GLM', filter_statistics = 3)
 # ZIPG_RF_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_var = T_var,
@@ -70,12 +72,12 @@ ZIPG_DE_S3 <- SKMSD(W = W, class_K = class_K, data_x = data_x, M = M, y = y, T_v
 In general, our package also includes a function (simulate_datasets_3) that can simulate the generation of multi-source count data. An example is provided below:
 
 ```{r} 
-data_pg_copula <- simulate_datasets_3(
-  times = 1, n_data = 2, n_1_all = c(400, 400), n_p_all = c(400, 800), n_p = c(40, 80),
-  diff = 0, prob_max = 0.5, marginal1 = "pg", copula1 = TRUE
-)
-i = 1 # i = 1,2;
-W = data_pg_copula[[1]][[1]][[i]][[1]][[1]] # i = 1,2;
+# data_pg_copula <- simulate_datasets_3(
+#   times = 1, n_data = 2, n_1_all = c(400, 400), n_p_all = c(400, 800), n_p = c(40, 80),
+#   diff = 0, prob_max = 0.5, marginal1 = "pg", copula1 = TRUE
+# )
+# i = 1 # i = 1,2;
+# W = data_pg_copula[[1]][[1]][[i]][[1]][[1]] # i = 1,2;
 ```
 
 <!-- You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. -->

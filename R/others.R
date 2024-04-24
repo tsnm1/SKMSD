@@ -30,7 +30,7 @@
 simulate_datasets_3 <- function(times = 1, n_data = 2, n_1_all = c(400, 400),
                                 n_p_all = c(200, 400, 600, 800), n_p = c(20, 40, 60, 80),
                                 diff = seq(10, 60, 10), prob_max = seq(0.1, 0.9, 0.2),
-                                rho_p = 0.5, n_x1 = 3, rho_x = 0.1, M_max = 1e2, fc1 = 2,
+                                rho_p = 0.5, n_x1 = 3, rho_x = 0.1, M_max = 1e2, fc1 = 1,
                                 marginal1 = "pg", copula1 = TRUE) {
   data_list <- res_prob_0 <- list()
   for (i in c(1:times)) {
@@ -93,7 +93,7 @@ simulate_datasets_3 <- function(times = 1, n_data = 2, n_1_all = c(400, 400),
 simulate_PG_6 <- function(n_1 = 20, n_p = 10, n_p_1 = 5,
                           diff = 0, k = 1,
                           prob_up1 = 0.1, prob_up2 = 0.1,
-                          rho_p = 0.5, n_x = 3, rho_x = 0.1, M_max = 1e2, fc = 2,
+                          rho_p = 0.5, n_x = 3, rho_x = 0.1, M_max = 1e2, fc = 1,
                           marginal = c("nb", "pg"), copula = TRUE, seed = 111) {
   # Call libraries
   if (!require(mvtnorm)) install.packages("mvtnorm")
