@@ -52,10 +52,11 @@ Simultaneous knockoff for multi-source count data
 }
 \examples{
 
+data(data_pg_copula)
 i = 1 # or 2
 data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
 count_K_j = data_K_j    #[data_K_j[,1]==c,]
-n_x1 <- ifelse(n_x1==0, 3, n_x1)
+n_x1 <- 3
 data_x <- as.data.frame(count_K_j[,c(1:n_x1+1)])
 W <- as.data.frame(count_K_j[,-c(1:(n_x1+2))])
 M <- count_K_j[,n_x1+2]

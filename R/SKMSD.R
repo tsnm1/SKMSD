@@ -21,6 +21,7 @@
 #'
 #' @examples
 #'
+#' data(data_pg_copula)
 #' i = 1 # or 2
 #' data_K_j <- data_pg_copula[[1]][[1]][[i]][[1]][[1]]
 #' count_K_j = data_K_j    #[data_K_j[,1]==c,]
@@ -44,15 +45,9 @@
 #'
 SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_var = 1, fdr = 0.2, offset = 1,
                   test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test") {
-  if (!requireNamespace(ZIPG, quietly = TRUE)) {
-    devtools::install_github("roulan2000/ZIPG")
-  }
-  # if (!requireNamespace(scDesign2, quietly = TRUE)) {
-  #   devtools::install_github("JSB-UCLA/scDesign2")
-  # }
-  if (!requireNamespace(knockoff, quietly = TRUE)) {
-    install.packages(knockoff)
-  }
+  if (!require(ZIPG)) devtools::install_github("roulan2000/ZIPG")
+  # if (!require(scDesign2)) devtools::install_github("JSB-UCLA/scDesign2")
+  if (!require(knockoff)) install.packages(knockoff)
   library(ZIPG)
   # library(scDesign2)
   library(knockoff)
