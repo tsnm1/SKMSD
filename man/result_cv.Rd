@@ -4,10 +4,10 @@
 \alias{result_cv}
 \title{Title}
 \usage{
-result_cv(r_SKMSD_cv, B = 1, filter_statistics = NULL, I = F)
+result_cv(r_SKMSD_cv, B = 1, filter_statistics = NULL, In = F, b_1 = NULL)
 }
 \arguments{
-\item{I}{}
+\item{b_1}{}
 }
 \value{
 SS1: Results based on the statistic of fliter in the method in the CV case

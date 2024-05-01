@@ -408,6 +408,10 @@ ZIPG_Estimate_3_1 <- function(data_x, W, M, zp_cutoff = 0.8, min_nonzero_num = 1
   }
 
   r1_1 <- apply(r1, 2, function(col) {
+    if (any(is.na(col))) {
+      col_mean <- runif(sum(is.na(col)), epsilon, 1 - epsilon)
+      col[is.na(col)] <- col_mean
+    }
     if (any(col > 1)) {
       col[col > 1] <- max(col[col < 1])
     }
@@ -1048,7 +1052,15 @@ contrast_score_computation <- function(W, result3, class0, test1) {
   test2 <- c("wilcox.test", "ks.test", "mmd", "distance_JS")
   test1 <- match(test1, test2)
 
-  umap_result <- umap(result3, n_components = 3)
+  allmean <- mean(result3, na.rm = TRUE)
+  result3_1 <- apply(result3, 2, function(col) {
+    # col_mean <- mean(col, na.rm = TRUE)
+    col_replace <- sample(c(0, allmean), sum(is.na(col)), replace = TRUE, prob = c(0.8, 0.2))
+    col[is.na(col)] <- col_replace
+    return(col)
+  })
+
+  umap_result <- umap(result3_1, n_components = 3)
   # kmeans_result <- kmeans(umap_result$layout, centers = 2)
   kmeans_result <- kmeans(umap_result, centers = 2)
   class1 <- kmeans_result$cluster

@@ -72,6 +72,15 @@ SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_va
     data_x_k <- data_x[class_K == k, ]
     M_k <- M[class_K == k]
 
+    W_k <- apply(W_k, 2, function(col) {
+      col_replace <- mean(col, na.rm = T)
+      col[is.na(col)] <- col_replace
+      if (any(is.na(col))) {
+        col[is.na(col)] <- 0
+      }
+      return(col)
+    })
+
     copula_result <- ZIPG_Estimate_3_1(data_x_k, W_k, M_k)
     model_K[[c]] <- copula_result
     c <- c + 1
@@ -86,7 +95,25 @@ SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_va
     y_k <- y[sub]
     copula_result <- model_K[[k1]]
 
+    W_k <- apply(W_k, 2, function(col) {
+      col_replace <- mean(col, na.rm = T)
+      col[is.na(col)] <- col_replace
+      if (any(is.na(col))) {
+        col[is.na(col)] <- 0
+      }
+      return(col)
+    })
+
     W_k_1 <- simulate_count_copula_3(copula_result, data_x_k, M_k)
+
+    W_k_1 <- apply(W_k_1, 2, function(col) {
+      col_replace <- mean(col, na.rm = T)
+      col[is.na(col)] <- col_replace
+      if (any(is.na(col))) {
+        col[is.na(col)] <- 0
+      }
+      return(col)
+    })
 
     if (test_statistic == "DE") {
       c_w_k <- contrast_score_computation(W_k, W_k_1, y_k, test1)
@@ -187,6 +214,15 @@ SKMSD_B <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var
     data_x_k <- data_x[class_K == k, ]
     M_k <- M[class_K == k]
 
+    W_k <- apply(W_k, 2, function(col) {
+      col_replace <- mean(col, na.rm = T)
+      col[is.na(col)] <- col_replace
+      if (any(is.na(col))) {
+        col[is.na(col)] <- 0
+      }
+      return(col)
+    })
+
     copula_result <- ZIPG_Estimate_3_1(data_x_k, W_k, M_k)
     model_K[[c]] <- copula_result
     c <- c + 1
@@ -201,9 +237,27 @@ SKMSD_B <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var
     y_k <- y[sub]
     copula_result <- model_K[[k1]]
 
+    W_k <- apply(W_k, 2, function(col) {
+      col_replace <- mean(col, na.rm = T)
+      col[is.na(col)] <- col_replace
+      if (any(is.na(col))) {
+        col[is.na(col)] <- 0
+      }
+      return(col)
+    })
+
     e_w_B <- c_w_B <- c()
     for (b in 1:B) {
       W_k_1 <- simulate_count_copula_3(copula_result, data_x_k, M_k)
+
+      W_k_1 <- apply(W_k_1, 2, function(col) {
+        col_replace <- mean(col, na.rm = T)
+        col[is.na(col)] <- col_replace
+        if (any(is.na(col))) {
+          col[is.na(col)] <- 0
+        }
+        return(col)
+      })
 
       if (test_statistic == "DE") {
         c_w_k <- contrast_score_computation(W_k, W_k_1, y_k, test1)
@@ -342,7 +396,7 @@ SKMSD_B <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var
 #' @param filter_statistics
 #' @param test1
 #' @param combine_1
-#' @param I Boolean value that represents the result of the computation based on the Intersection.
+#' @param In Boolean value that represents the result of the computation based on the Intersection.
 #'
 #' @return Same as SKMSD and SKMSD_B;
 #' @export
@@ -351,7 +405,7 @@ SKMSD_B <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var
 SKMSD_cv <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var = NULL, fdr = 0.2, offset = 1,
                      cv = 1, method = "ZIPG",
                      B = 1, Bstat = 2, test_statistic = "DE", filter_statistics = 3, test1 = "wilcox.test",
-                     combine_1 = "simul", I = F) {
+                     combine_1 = "simul", In = F) {
   if (!require(ZIPG)) devtools::install_github("roulan2000/ZIPG")
   # if (!require(scDesign2)) devtools::install_github("JSB-UCLA/scDesign2")
   if (!require(knockoff)) install.packages(knockoff)
@@ -406,7 +460,7 @@ SKMSD_cv <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_va
   # S_cv
   f2 <- ifelse(filter_statistics == 1, 3, 1)
   r_SKMSD_cv <- list(fdr = fdr, cv = cv, S_cv = S_cv, K = length(n_data))
-  r_cv <- result_cv(r_SKMSD_cv, B = B, filter_statistics = f2, I = I)
+  r_cv <- result_cv(r_SKMSD_cv, B = B, filter_statistics = f2, In = In, b_1 = T_var)
 
   return(list(r_SKMSD_cv = r_SKMSD_cv, r_cv = r_cv))
 }
@@ -416,7 +470,8 @@ SKMSD_cv <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_va
 #' @param r_SKMSD_cv
 #' @param B
 #' @param filter_statistics
-#' @param I
+#' @param In
+#' @param b_1
 #'
 #' @return
 #' SS1: Results based on the statistic of fliter in the method in the CV case
@@ -425,7 +480,7 @@ SKMSD_cv <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_va
 #' @export
 #'
 #' @examples
-result_cv <- function(r_SKMSD_cv, B = 1, filter_statistics = NULL, I = F) {
+result_cv <- function(r_SKMSD_cv, B = 1, filter_statistics = NULL, In = F, b_1 = NULL) {
   cv <- r_SKMSD_cv$cv
   fdr <- r_SKMSD_cv$fdr
   K <- r_SKMSD_cv$K
@@ -443,7 +498,7 @@ result_cv <- function(r_SKMSD_cv, B = 1, filter_statistics = NULL, I = F) {
         SS_f1 <- c(SS_f1, S_f$S)
       }
       if (I) {
-        S_I <- inter_cw(c_w = result_fold$c_w, b_1 = NULL, fdr = fdr)
+        S_I <- inter_cw(c_w = result_fold$c_w, b_1 = b_1, fdr = fdr)
         SS_I1 <- c(SS_I1, S_I$S)
       }
     } else {
@@ -539,6 +594,15 @@ SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T
       data_x_k <- data_x[class_K == k, ]
       M_k <- M[class_K == k]
 
+      W_k <- apply(W_k, 2, function(col) {
+        col_replace <- mean(col, na.rm = T)
+        col[is.na(col)] <- col_replace
+        if (any(is.na(col))) {
+          col[is.na(col)] <- 0
+        }
+        return(col)
+      })
+
       copula_result <- ZIPG_Estimate_3_1(data_x_k, W_k, M_k)
       model_K[[c]] <- copula_result
       c <- c + 1
@@ -553,22 +617,32 @@ SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T
     M_k <- M[sub]
     y_k <- y[sub]
 
+    W_k <- apply(W_k, 2, function(col) {
+      col_replace <- mean(col, na.rm = T)
+      col[is.na(col)] <- col_replace
+      if (any(is.na(col))) {
+        col[is.na(col)] <- 0
+      }
+      return(col)
+    })
+
     if (method == "ZIPG") {
       copula_result <- model_K[[k1]]
       W_k_1 <- simulate_count_copula_3(copula_result, data_x_k, M_k)
     } else if (method == "knockoff") {
-      random_m <- matrix(runif(dim(W_k)[1] * dim(W_k)[2], min = 0, max = 1), nrow = dim(W_k)[1])
-      # W_k_1 <- W_k_1 + random_m
-      W_k <- W_k + random_m
-      result_konckoffs1 <- knockoff.filter(W_k, y_k,
-        knockoffs = create.second_order,
-        statistic = stat.random_forest, fdr = fdr
-      )
-      W_k_1 <- result_konckoffs1$Xk # + random_m
-      W_k <- W_k - random_m
+      W_k_1 <- create.second_order(W_k)
     } else if (method == "ZINB") {
       W_k_1 <- scDesign2_simulation(W_k, y_k)
     }
+
+    W_k_1 <- apply(W_k_1, 2, function(col) {
+      col_replace <- mean(col, na.rm = T)
+      col[is.na(col)] <- col_replace
+      if (any(is.na(col))) {
+        col[is.na(col)] <- 0
+      }
+      return(col)
+    })
 
     if (test_statistic == "DE") {
       c_w_k <- contrast_score_computation(W_k, W_k_1, y_k, test1)
@@ -685,6 +759,16 @@ SKMSD_B_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y,
       W_k <- W[class_K == k, ]
       data_x_k <- data_x[class_K == k, ]
       M_k <- M[class_K == k]
+
+      W_k <- apply(W_k, 2, function(col) {
+        col_replace <- mean(col, na.rm = T)
+        col[is.na(col)] <- col_replace
+        if (any(is.na(col))) {
+          col[is.na(col)] <- 0
+        }
+        return(col)
+      })
+
       copula_result <- ZIPG_Estimate_3_1(data_x_k, W_k, M_k)
       model_K[[c]] <- copula_result
       c <- c + 1
@@ -700,6 +784,15 @@ SKMSD_B_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y,
     y_k <- y[sub]
     # copula_result = model_K[[k1]]
 
+    W_k <- apply(W_k, 2, function(col) {
+      col_replace <- mean(col, na.rm = T)
+      col[is.na(col)] <- col_replace
+      if (any(is.na(col))) {
+        col[is.na(col)] <- 0
+      }
+      return(col)
+    })
+
     e_w_B <- c_w_B <- c()
     for (b in 1:B) {
       # W_k_1 <- simulate_count_copula_3(copula_result,data_x_k,M_k)
@@ -708,18 +801,19 @@ SKMSD_B_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y,
         copula_result <- model_K[[k1]]
         W_k_1 <- simulate_count_copula_3(copula_result, data_x_k, M_k)
       } else if (method == "knockoff") {
-        random_m <- matrix(runif(dim(W_k)[1] * dim(W_k)[2], min = 0, max = 1), nrow = dim(W_k)[1])
-        # W_k_1 <- W_k_1 + random_m
-        W_k <- W_k + random_m
-        result_konckoffs1 <- knockoff.filter(W_k, y_k,
-          knockoffs = create.second_order,
-          statistic = stat.random_forest, fdr = fdr
-        )
-        W_k_1 <- result_konckoffs1$Xk # + random_m
-        W_k <- W_k - random_m
+        W_k_1 <- create.second_order(W_k)
       } else if (method == "ZINB") {
         W_k_1 <- scDesign2_simulation(W_k, y_k)
       }
+
+      W_k_1 <- apply(W_k_1, 2, function(col) {
+        col_replace <- mean(col, na.rm = T)
+        col[is.na(col)] <- col_replace
+        if (any(is.na(col))) {
+          col[is.na(col)] <- 0
+        }
+        return(col)
+      })
 
       if (test_statistic == "DE") {
         c_w_k <- contrast_score_computation(W_k, W_k_1, y_k, test1)

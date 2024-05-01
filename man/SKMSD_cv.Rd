@@ -21,7 +21,7 @@ SKMSD_cv(
   filter_statistics = 3,
   test1 = "wilcox.test",
   combine_1 = "simul",
-  I = F
+  In = F
 )
 }
 \arguments{
@@ -31,7 +31,7 @@ SKMSD_cv(
 
 \item{method}{Synthetic data generation methods, c('ZIPG','ZINB','knockoff');}
 
-\item{I}{Boolean value that represents the result of the computation based on the Intersection.}
+\item{In}{Boolean value that represents the result of the computation based on the Intersection.}
 }
 \value{
 Same as SKMSD and SKMSD_B;
