@@ -370,9 +370,13 @@ ZIPG_Estimate_3_1 <- function(data_x, W, M, zp_cutoff = 0.8, min_nonzero_num = 1
     X <- as.matrix(cbind(1, data.frame(data_x)))
     param_1 <- ZIPG_res$res$par # p = 0.5
 
-    beta <- param_1[1:4]
-    beta_star <- param_1[5:8]
-    prob0 <- 1 / (1 + exp(-param_1[9]))
+    # beta <- param_1[1:4]
+    # beta_star <- param_1[5:8]
+    # prob0 <- 1 / (1 + exp(-param_1[9]))
+    beta <- param_1[1:dim(X)[2]]
+    beta_star <- param_1[(dim(X)[2] + 1):(dim(X)[2] * 2)]
+    prob0 <- 1 / (1 + exp(-param_1[dim(X)[2] * 2 + 1]))
+
     lambda <- X %*% beta + log(M) # exp(X %*% beta )*M
     theta <- X %*% beta_star # exp(X %*% beta_star)
     # hist(lambda/M)
@@ -636,9 +640,13 @@ simulate_count_copula_3 <- function(copula_result, data_x, M) {
   # t6=Sys.time()
   result31 <- sapply(1:p1, function(iter) {
     param <- copula_result$marginal_param1[, iter]
-    beta <- param[1:4]
-    beta_star <- param[5:8]
-    prob0 <- 1 / (1 + exp(-param[9]))
+    # beta <- param[1:4]
+    # beta_star <- param[5:8]
+    # prob0 <- 1 / (1 + exp(-param[9]))
+    beta <- param[1:dim(X)[2]]
+    beta_star <- param[(dim(X)[2] + 1):(dim(X)[2] * 2)]
+    prob0 <- 1 / (1 + exp(-param[dim(X)[2] * 2 + 1]))
+
     lambda <- X %*% beta + log(M) # exp(X %*% beta )*M
     theta <- X %*% beta_star # exp(X %*% beta_star)
     p_cdf_0 <- pmax(0.0, result2[, iter] - prob0) / (1 - prob0)
