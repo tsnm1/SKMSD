@@ -98,6 +98,9 @@ SKMSD <- function(W = W, class_K = class_K, data_x = NULL, M = NULL, y = y, T_va
     W_k <- apply(W_k, 2, function(col) {
       col_replace <- mean(col, na.rm = T)
       col[is.na(col)] <- col_replace
+      if (any(is.infinite(col))) {
+        col[is.infinite(col)] <- max(col[!is.infinite(col)])
+      }
       if (any(is.na(col))) {
         col[is.na(col)] <- 0
       }
@@ -240,6 +243,9 @@ SKMSD_B <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T_var
     W_k <- apply(W_k, 2, function(col) {
       col_replace <- mean(col, na.rm = T)
       col[is.na(col)] <- col_replace
+      if (any(is.infinite(col))) {
+        col[is.infinite(col)] <- max(col[!is.infinite(col)])
+      }
       if (any(is.na(col))) {
         col[is.na(col)] <- 0
       }
@@ -620,6 +626,9 @@ SKMSD_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y, T
     W_k <- apply(W_k, 2, function(col) {
       col_replace <- mean(col, na.rm = T)
       col[is.na(col)] <- col_replace
+      if (any(is.infinite(col))) {
+        col[is.infinite(col)] <- max(col[!is.infinite(col)])
+      }
       if (any(is.na(col))) {
         col[is.na(col)] <- 0
       }
@@ -787,6 +796,9 @@ SKMSD_B_other <- function(W = W, class_K = NULL, data_x = NULL, M = NULL, y = y,
     W_k <- apply(W_k, 2, function(col) {
       col_replace <- mean(col, na.rm = T)
       col[is.na(col)] <- col_replace
+      if (any(is.infinite(col))) {
+        col[is.infinite(col)] <- max(col[!is.infinite(col)])
+      }
       if (any(is.na(col))) {
         col[is.na(col)] <- 0
       }
